@@ -41,7 +41,7 @@ export default function Home() {
       ) : (
         user && (
           <footer className="fixed bottom-12 left-12">
-            <div className="flex items-center space-x-4 rounded-full p-4 hover:bg-gray-900">
+            <button className="flex items-center space-x-4 rounded-full p-4 hover:bg-gray-900">
               <Image
                 src={user.imageUrl}
                 alt="profile pic"
@@ -50,7 +50,7 @@ export default function Home() {
                 className="rounded-full"
               />
               <div className="flex flex-col">
-                <button className="w-full text-left">Mutter something,</button>
+                <span className="w-full text-left">Mutter something,</span>
                 <span className="text-left text-gray-400">
                   @{user.username}
                 </span>
@@ -60,7 +60,7 @@ export default function Home() {
                   <FaSignOutAlt className="h-full w-full" />
                 </button>
               </SignOutButton>
-            </div>
+            </button>
           </footer>
         )
       )}
