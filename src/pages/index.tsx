@@ -2,7 +2,7 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 
 const Posts = () => {
   const { data } = api.post.getSome.useQuery();
@@ -10,13 +10,37 @@ const Posts = () => {
   return (
     <div>
       {data?.map((post) => (
-        <div key={post.id}>{post.content}</div>
+        <Post key={post.id} {...post} />
       ))}
     </div>
   );
 };
+
+const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
+  return (
+    <div className="flex space-x-4 p-4">
+      <Image
+        src={props.author.image}
+        alt={`profile image of ${props.author.name || "someone"}`}
+        width={69}
+        height={69}
+        className="h-fit rounded-full"
+      />
+      <div className="flex flex-col space-y-3">
+        <div className="flex items-center space-x-2">
+          <span className="text-lg font-semibold">@{props.author.name}</span>
+          <span className="text-gray-400">69 secs ago</span>
+        </div>
+        <div>{props.content}</div>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const { user, isSignedIn } = useUser();
+
+  console.log(user?.id);
 
   return (
     <>
