@@ -1,10 +1,22 @@
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
+import { api } from "~/utils/api";
 
+const Posts = () => {
+  const { data } = api.post.getSome.useQuery();
+
+  return (
+    <div>
+      {data?.map((post) => (
+        <div key={post.id}>{post.content}</div>
+      ))}
+    </div>
+  );
+};
 export default function Home() {
   const { user, isSignedIn } = useUser();
-  console.log(user);
+
   return (
     <>
       <Head>
@@ -13,26 +25,38 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        {isSignedIn && (
-          <Image
-            src={user?.imageUrl || ""}
-            alt="prof pic"
-            width={40}
-            height={40}
-          />
-        )}
-        {!isSignedIn ? (
+        <Posts />
+      </main>
+
+      {!isSignedIn ? (
+        <footer className="fixed bottom-0 left-0 flex flex-col items-center space-y-3 rounded-tr bg-emerald-700 px-9 py-7">
+          <span className="text-xl">Join the Muttering.</span>
           <SignInButton mode="modal">
-            <button className="rounded bg-emerald-700 px-6 py-3">
+            <button className="w-fit rounded bg-gray-100 px-4 py-2 text-emerald-700">
               Sign In
             </button>
           </SignInButton>
-        ) : (
-          <SignOutButton>
-            <button>Sign Out</button>
-          </SignOutButton>
-        )}
-      </main>
+        </footer>
+      ) : (
+        <footer className="fixed bottom-12 left-12 ">
+          <button className="flex items-center space-x-2 rounded-full bg-emerald-200 p-3">
+            <Image
+              src={user.imageUrl}
+              alt="profile pic"
+              width={55}
+              height={55}
+              className="rounded-full"
+            />
+            <div className="text-gray-700">@{user.username}</div>
+          </button>
+          {/* TODO: implement popup for sign out button */}
+          {/* <SignOutButton>
+            <button className="rounded bg-emerald-700 px-6 py-3">
+              Sign Out
+            </button>
+          </SignOutButton> */}
+        </footer>
+      )}
     </>
   );
 }
