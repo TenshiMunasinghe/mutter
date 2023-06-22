@@ -2,7 +2,7 @@ import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Head from "next/head";
 import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
-import { RouterOutputs, api } from "~/utils/api";
+import { api, type RouterOutputs } from "~/utils/api";
 
 const Posts = () => {
   const { data } = api.post.getSome.useQuery();
