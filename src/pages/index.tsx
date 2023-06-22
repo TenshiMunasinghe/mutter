@@ -37,6 +37,27 @@ const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
   );
 };
 
+const Form = (props: {
+  user: { name: string; imageUrl: string; id: string };
+}) => {
+  return (
+    <form className="sticky top-0 flex w-full items-stretch space-x-5 border-2 border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm">
+      <Image
+        src={props.user.imageUrl}
+        alt={`profile image of ${props.user.name || "someone"}`}
+        width={42}
+        height={42}
+        className="h-fit rounded-full"
+      />
+      <input
+        type="text"
+        className="w-full bg-transparent"
+        placeholder="Mutter something."
+      />
+    </form>
+  );
+};
+
 export default function Home() {
   const { user, isSignedIn } = useUser();
 
@@ -49,20 +70,13 @@ export default function Home() {
       </Head>
       <main className="relative mx-auto flex min-h-screen flex-col items-center lg:max-w-2xl">
         {user && (
-          <form className="sticky top-0 flex w-full items-stretch space-x-5 border-2 border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm">
-            <Image
-              src={user.imageUrl}
-              alt={`profile image of ${user.username || "someone"}`}
-              width={42}
-              height={42}
-              className="h-fit rounded-full"
-            />
-            <input
-              type="text"
-              className="w-full bg-transparent"
-              placeholder="Mutter something."
-            />
-          </form>
+          <Form
+            user={{
+              name: user.username || "",
+              imageUrl: user.imageUrl,
+              id: user.id,
+            }}
+          />
         )}
         <Posts />
       </main>
