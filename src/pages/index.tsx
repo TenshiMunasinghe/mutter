@@ -1,9 +1,13 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
 import { FaSignOutAlt } from "react-icons/fa";
 import { api, type RouterOutputs } from "~/utils/api";
+
+dayjs.extend(relativeTime);
 
 const Posts = () => {
   const { data } = api.post.getSome.useQuery();
@@ -18,6 +22,8 @@ const Posts = () => {
 };
 
 const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
+  const postedAt = dayjs().to(props.createdAt.toISOString());
+
   return (
     <div className="flex space-x-4 bg-gray-950 p-4">
       <Image
@@ -30,7 +36,7 @@ const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
       <div className="flex flex-col space-y-3">
         <div className="flex items-center space-x-2">
           <span className="text-lg font-semibold">@{props.author.name}</span>
-          <span className="text-gray-400">69 secs ago</span>
+          <span className="text-gray-400">{postedAt}</span>
         </div>
         <div>{props.content}</div>
       </div>
