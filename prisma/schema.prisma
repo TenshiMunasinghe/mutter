@@ -65,8 +65,8 @@ model Post {
     parentId  String?
     parent    Post?           @relation(name: "ParentPost", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // https://pris.ly/d/cyclic-referential-actions
     comments  Post[]          @relation(name: "ParentPost")
-    user      User?           @relation(fields: [userId], references: [id])
-    userId    String?
+    user      User            @relation(fields: [userId], references: [id])
+    userId    String
     likes     Likes[]
     remut     UserPostRemut[]
 
