@@ -6,16 +6,70 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
     relationMode = "prisma"
 }
 
-model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content String @db.VarChar(255)
-    authorId String
+model User {
+    id          String          @id
+    createdAt   DateTime        @default(now())
+    posts       Post[]
+    postremuts  UserPostRemut[]
+    likes       Likes[]
+    bio         String
+    followedBy  Follow[]        @relation(name: "FollowedBy")
+    followingTo Follow[]        @relation(name: "FollowingTo")
+}
 
-    @@index ([authorId])
+model Follow {
+    followedById  String
+    followedBy    User     @relation(name: "FollowingTo", fields: [followedById], references: [id])
+    followingToId String
+    followingTo   User     @relation(name: "FollowedBy", fields: [followingToId], references: [id])
+    createdAt     DateTime @default(now())
+
+    @@id([followingToId, followedById])
+    @@index([followedById])
+    @@index([followingToId])
+}
+
+model Likes {
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    postId    String
+    post      Post     @relation(fields: [postId], references: [id])
+    createdAt DateTime @default(now())
+
+    @@id([userId, postId])
+    @@index([postId])
+    @@index([userId])
+}
+
+model UserPostRemut {
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    postId    String
+    post      Post     @relation(fields: [postId], references: [id])
+    createdAt DateTime @default(now())
+
+    @@id([userId, postId])
+    @@index([postId])
+    @@index([userId])
+}
+
+model Post {
+    id        String          @id @default(cuid())
+    createdAt DateTime        @default(now())
+    content   String          @db.VarChar(255)
+    parentId  String?
+    parent    Post?           @relation(name: "ParentPost", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // https://pris.ly/d/cyclic-referential-actions
+    comments  Post[]          @relation(name: "ParentPost")
+    user      User?           @relation(fields: [userId], references: [id])
+    userId    String?
+    likes     Likes[]
+    remut     UserPostRemut[]
+
+    @@index([parentId])
+    @@index([userId])
 }
