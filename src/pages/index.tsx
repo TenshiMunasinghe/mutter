@@ -63,7 +63,7 @@ const Form = (props: {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        mutation.mutate({ content: input, authorId: user.id });
+        mutation.mutate({ content: input, userId: user.id });
       }}
       className="sticky top-0 flex w-full items-stretch space-x-5 border-2 border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm"
     >

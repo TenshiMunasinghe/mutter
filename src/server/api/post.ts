@@ -9,15 +9,20 @@ import {
 
 export const postRouter = createTRPCRouter({
   getSome: publicProcedure.query(async ({ ctx }) => {
-    const res = await ctx.prisma.post.findMany({ take: 10 });
+    const res = await ctx.prisma.post.findMany({
+      take: 10,
+      where: {
+        parentId: null,
+      },
+    });
 
     const users = await clerkClient.users.getUserList({
-      userId: res.map((p) => p.authorId),
+      userId: res.map((post) => post.userId),
       limit: 100,
     });
 
     return res.map((post) => {
-      const author = users.find((u) => u.id === post.authorId);
+      const author = users.find((u) => u.id === post.userId);
       if (!author)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -30,7 +35,7 @@ export const postRouter = createTRPCRouter({
     });
   }),
   makePost: protectedProcedure
-    .input(z.object({ content: z.string(), authorId: z.string() }))
+    .input(z.object({ content: z.string(), userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
         await ctx.prisma.post.create({
