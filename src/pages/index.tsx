@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare, FaSignOutAlt } from "react-icons/fa";
-import { api, type RouterOutputs } from "~/utils/api";
+import { api } from "~/utils/api";
 
 dayjs.extend(relativeTime);
 
@@ -18,53 +18,56 @@ const Posts = () => {
   return (
     <div className="grid w-full space-y-[2px] border-x-2 border-gray-600 bg-gray-600">
       {data?.map((post) => (
-        <Post key={post.id} {...post} />
+        <Post key={post.id} id={post.id} />
       ))}
     </div>
   );
 };
 
-const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
+const Post = ({ id }: { id: string }) => {
   const trpcContext = api.useContext();
+  const { data: post } = api.post.getById.useQuery({ id });
 
   const { mutate: remutMutate } = api.post.remut.useMutation({
     async onSuccess() {
-      await trpcContext.post.getSome.invalidate();
+      await trpcContext.post.getById.invalidate({ id });
     },
   });
 
-  const postedAt = dayjs().to(props.createdAt.toISOString());
+  if (!post) return null;
+
+  const postedAt = dayjs().to(post.createdAt.toISOString());
 
   return (
     <div className="flex space-x-4 bg-gray-950 p-4">
       <Image
-        src={props.author.image}
-        alt={`profile image of ${props.author.name || "someone"}`}
+        src={post.author.image}
+        alt={`profile image of ${post.author.name || "someone"}`}
         width={69}
         height={69}
         className="h-fit rounded-full"
       />
       <div className="flex flex-col space-y-3">
         <div className="flex items-center space-x-2">
-          <span className="text-lg font-semibold">@{props.author.name}</span>
+          <span className="text-lg font-semibold">@{post.author.name}</span>
           <span className="text-gray-400">{postedAt}</span>
         </div>
-        <div>{props.content}</div>
+        <div>{post.content}</div>
         <div className="grid grid-cols-4 items-center">
           <PostIcon icon={FaRegComment} className="hover:text-emerald-400">
-            <span>{props.comments.length}</span>
+            <span>{post.comments.length}</span>
           </PostIcon>
           <PostIcon
             icon={FaRetweet}
             className="hover:text-blue-400"
             onClick={() =>
-              remutMutate({ postId: props.id, userId: props.userId })
+              remutMutate({ postId: post.id, userId: post.userId })
             }
           >
-            <span>{props.remuts.length}</span>
+            <span>{post.remuts.length}</span>
           </PostIcon>
           <PostIcon icon={AiOutlineHeart} className="hover:text-red-400">
-            <span>{props.likes.length}</span>
+            <span>{post.likes.length}</span>
           </PostIcon>
           <PostIcon icon={FaShare} className="hover:text-emerald-400" />
         </div>

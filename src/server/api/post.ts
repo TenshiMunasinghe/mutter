@@ -14,49 +14,55 @@ export const postRouter = createTRPCRouter({
       where: {
         parentId: null,
       },
+      select: { id: true },
     });
 
-    const users = await clerkClient.users.getUserList({
-      userId: posts.map((post) => post.userId),
-      limit: 100,
-    });
-
-    const likes = await ctx.prisma.likes.findMany({
-      where: {
-        postId: { in: posts.map((post) => post.id) },
-      },
-    });
-
-    const remuts = await ctx.prisma.userPostRemut.findMany({
-      where: {
-        postId: { in: posts.map((post) => post.id) },
-      },
-    });
-
-    const comments = await ctx.prisma.post.findMany({
-      where: {
-        parentId: {
-          in: posts.map((post) => post.parentId ?? ""),
+    return posts;
+  }),
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.id,
         },
-      },
-    });
+      });
 
-    return posts.map((post) => {
-      const author = users.find((u) => u.id === post.userId);
-      if (!author)
+      if (!post) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "No author found.",
+          message: "No post found.",
         });
+      }
+
+      const author = await clerkClient.users.getUser(post.userId);
+
+      const likes = await ctx.prisma.likes.findMany({
+        where: {
+          postId: post.id,
+        },
+      });
+
+      const remuts = await ctx.prisma.userPostRemut.findMany({
+        where: {
+          postId: post.id,
+        },
+      });
+
+      const comments = await ctx.prisma.post.findMany({
+        where: {
+          parentId: post.id,
+        },
+      });
+
       return {
         author: { name: author.username, image: author.imageUrl },
-        likes: likes.filter((like) => like.postId === post.id),
-        remuts: remuts.filter((remut) => remut.postId === post.id),
-        comments: comments.filter((comment) => comment.parentId === post.id),
+        likes,
+        remuts,
+        comments,
         ...post,
       };
-    });
-  }),
+    }),
   makePost: protectedProcedure
     .input(z.object({ content: z.string(), userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
