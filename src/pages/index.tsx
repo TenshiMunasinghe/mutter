@@ -52,9 +52,7 @@ const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
           <PostIcon icon={AiOutlineHeart} className="hover:text-red-400">
             <span>{props.likes.length}</span>
           </PostIcon>
-          <button>
-            <FaShare className="h-4 w-4 hover:text-emerald-400" />
-          </button>
+          <PostIcon icon={FaShare} className="hover:text-emerald-400" />
         </div>
       </div>
     </div>
@@ -63,18 +61,24 @@ const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
 
 const PostIcon = ({
   icon: Icon,
-  children,
-  className,
+  ...props
 }: {
   icon: IconType;
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
+  onClick?: () => void;
 }) => {
   return (
-    <div className={classnames("flex items-center space-x-2", className)}>
+    <button
+      className={classnames(
+        "flex items-center space-x-2 transition-colors",
+        props.className
+      )}
+      onClick={props.onClick}
+    >
       <Icon className="h-4 w-4" />
-      {children}
-    </div>
+      {props.children}
+    </button>
   );
 };
 
