@@ -71,4 +71,30 @@ export const postRouter = createTRPCRouter({
         return { success: false, error };
       }
     }),
+  remut: protectedProcedure
+    .input(z.object({ postId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const remutIds = {
+          postId: input.postId,
+          userId: input.userId,
+        };
+        const isRemutExist = !!(await ctx.prisma.userPostRemut.findUnique({
+          where: { userId_postId: remutIds },
+        }));
+        if (isRemutExist) {
+          const res = await ctx.prisma.userPostRemut.delete({
+            where: { userId_postId: remutIds },
+          });
+
+          return res;
+        } else {
+          const res = await ctx.prisma.userPostRemut.create({
+            data: remutIds,
+          });
+
+          return res;
+        }
+      } catch (e) {}
+    }),
 });

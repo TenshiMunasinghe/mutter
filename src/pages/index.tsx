@@ -25,6 +25,14 @@ const Posts = () => {
 };
 
 const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
+  const trpcContext = api.useContext();
+
+  const { mutate: remutMutate } = api.post.remut.useMutation({
+    async onSuccess() {
+      await trpcContext.post.getSome.invalidate();
+    },
+  });
+
   const postedAt = dayjs().to(props.createdAt.toISOString());
 
   return (
@@ -46,7 +54,13 @@ const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
           <PostIcon icon={FaRegComment} className="hover:text-emerald-400">
             <span>{props.comments.length}</span>
           </PostIcon>
-          <PostIcon icon={FaRetweet} className="hover:text-blue-400">
+          <PostIcon
+            icon={FaRetweet}
+            className="hover:text-blue-400"
+            onClick={() =>
+              remutMutate({ postId: props.id, userId: props.userId })
+            }
+          >
             <span>{props.remuts.length}</span>
           </PostIcon>
           <PostIcon icon={AiOutlineHeart} className="hover:text-red-400">
