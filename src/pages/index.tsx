@@ -1,10 +1,13 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import classnames from "classnames";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Head from "next/head";
 import Image from "next/image";
-import { useState } from "react";
-import { FaSignOutAlt } from "react-icons/fa";
+import { useState, type ReactNode } from "react";
+import type { IconType } from "react-icons";
+import { AiOutlineHeart } from "react-icons/ai";
+import { FaRegComment, FaRetweet, FaShare, FaSignOutAlt } from "react-icons/fa";
 import { api, type RouterOutputs } from "~/utils/api";
 
 dayjs.extend(relativeTime);
@@ -39,7 +42,38 @@ const Post = (props: RouterOutputs["post"]["getSome"][number]) => {
           <span className="text-gray-400">{postedAt}</span>
         </div>
         <div>{props.content}</div>
+        <div className="grid grid-cols-4 items-center">
+          <PostIcon icon={FaRegComment} className="hover:text-emerald-400">
+            <span>{props.comments.length}</span>
+          </PostIcon>
+          <PostIcon icon={FaRetweet} className="hover:text-blue-400">
+            <span>{props.remuts.length}</span>
+          </PostIcon>
+          <PostIcon icon={AiOutlineHeart} className="hover:text-red-400">
+            <span>{props.likes.length}</span>
+          </PostIcon>
+          <button>
+            <FaShare className="h-4 w-4 hover:text-emerald-400" />
+          </button>
+        </div>
       </div>
+    </div>
+  );
+};
+
+const PostIcon = ({
+  icon: Icon,
+  children,
+  className,
+}: {
+  icon: IconType;
+  children: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div className={classnames("flex items-center space-x-2", className)}>
+      <Icon className="h-4 w-4" />
+      {children}
     </div>
   );
 };

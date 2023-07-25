@@ -9,7 +9,7 @@ import {
 
 export const postRouter = createTRPCRouter({
   getSome: publicProcedure.query(async ({ ctx }) => {
-    const res = await ctx.prisma.post.findMany({
+    const posts = await ctx.prisma.post.findMany({
       take: 10,
       where: {
         parentId: null,
@@ -17,11 +17,31 @@ export const postRouter = createTRPCRouter({
     });
 
     const users = await clerkClient.users.getUserList({
-      userId: res.map((post) => post.userId),
+      userId: posts.map((post) => post.userId),
       limit: 100,
     });
 
-    return res.map((post) => {
+    const likes = await ctx.prisma.likes.findMany({
+      where: {
+        postId: { in: posts.map((post) => post.id) },
+      },
+    });
+
+    const remuts = await ctx.prisma.userPostRemut.findMany({
+      where: {
+        postId: { in: posts.map((post) => post.id) },
+      },
+    });
+
+    const comments = await ctx.prisma.post.findMany({
+      where: {
+        parentId: {
+          in: posts.map((post) => post.parentId ?? ""),
+        },
+      },
+    });
+
+    return posts.map((post) => {
       const author = users.find((u) => u.id === post.userId);
       if (!author)
         throw new TRPCError({
@@ -30,6 +50,9 @@ export const postRouter = createTRPCRouter({
         });
       return {
         author: { name: author.username, image: author.imageUrl },
+        likes: likes.filter((like) => like.postId === post.id),
+        remuts: remuts.filter((remut) => remut.postId === post.id),
+        comments: comments.filter((comment) => comment.parentId === post.id),
         ...post,
       };
     });
