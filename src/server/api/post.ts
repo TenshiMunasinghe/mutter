@@ -95,6 +95,8 @@ export const postRouter = createTRPCRouter({
 
           return res;
         }
-      } catch (e) {}
+      } catch (error) {
+        return { error };
+      }
     }),
 });
