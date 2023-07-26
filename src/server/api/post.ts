@@ -105,4 +105,32 @@ export const postRouter = createTRPCRouter({
         return { error };
       }
     }),
+  like: protectedProcedure
+    .input(z.object({ postId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const likeIds = {
+          postId: input.postId,
+          userId: input.userId,
+        };
+        const islikeExist = !!(await ctx.prisma.like.findUnique({
+          where: { userId_postId: likeIds },
+        }));
+        if (islikeExist) {
+          const res = await ctx.prisma.like.delete({
+            where: { userId_postId: likeIds },
+          });
+
+          return res;
+        } else {
+          const res = await ctx.prisma.like.create({
+            data: likeIds,
+          });
+
+          return res;
+        }
+      } catch (error) {
+        return { error };
+      }
+    }),
 });

@@ -20,6 +20,12 @@ const Post = ({ id }: { id: string }) => {
     },
   });
 
+  const { mutate: likeMutate } = api.post.like.useMutation({
+    async onSuccess() {
+      await trpcContext.post.getById.invalidate({ id });
+    },
+  });
+
   if (!post) return null;
 
   const postedAt = dayjs().to(post.createdAt.toISOString());
@@ -52,7 +58,11 @@ const Post = ({ id }: { id: string }) => {
           >
             <span>{post.remuts.length}</span>
           </PostIcon>
-          <PostIcon icon={AiOutlineHeart} className="hover:text-red-400">
+          <PostIcon
+            icon={AiOutlineHeart}
+            className="hover:text-red-400"
+            onClick={() => likeMutate({ postId: post.id, userId: post.userId })}
+          >
             <span>{post.likes.length}</span>
           </PostIcon>
           <PostIcon icon={FaShare} className="hover:text-emerald-400" />
