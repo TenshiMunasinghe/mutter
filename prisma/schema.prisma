@@ -16,7 +16,7 @@ model User {
     createdAt   DateTime @default(now())
     posts       Post[]
     postremuts  Remut[]
-    likes       Likes[]
+    likes       Like[]
     bio         String
     followedBy  Follow[] @relation(name: "FollowedBy")
     followingTo Follow[] @relation(name: "FollowingTo")
@@ -34,7 +34,7 @@ model Follow {
     @@index([followingToId])
 }
 
-model Likes {
+model Like {
     userId    String
     user      User     @relation(fields: [userId], references: [id])
     postId    String
@@ -67,7 +67,7 @@ model Post {
     comments  Post[]   @relation(name: "ParentPost")
     user      User     @relation(fields: [userId], references: [id])
     userId    String
-    likes     Likes[]
+    likes     Like[]
     remut     Remut[]
 
     @@index([parentId])

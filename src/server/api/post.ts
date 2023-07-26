@@ -37,7 +37,7 @@ export const postRouter = createTRPCRouter({
 
       const author = await clerkClient.users.getUser(post.userId);
 
-      const likes = await ctx.prisma.likes.findMany({
+      const likes = await ctx.prisma.like.findMany({
         where: {
           postId: post.id,
         },
