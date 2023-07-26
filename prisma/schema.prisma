@@ -12,14 +12,14 @@ datasource db {
 }
 
 model User {
-    id          String          @id
-    createdAt   DateTime        @default(now())
+    id          String   @id
+    createdAt   DateTime @default(now())
     posts       Post[]
-    postremuts  UserPostRemut[]
+    postremuts  Remut[]
     likes       Likes[]
     bio         String
-    followedBy  Follow[]        @relation(name: "FollowedBy")
-    followingTo Follow[]        @relation(name: "FollowingTo")
+    followedBy  Follow[] @relation(name: "FollowedBy")
+    followingTo Follow[] @relation(name: "FollowingTo")
 }
 
 model Follow {
@@ -46,7 +46,7 @@ model Likes {
     @@index([userId])
 }
 
-model UserPostRemut {
+model Remut {
     userId    String
     user      User     @relation(fields: [userId], references: [id])
     postId    String
@@ -59,16 +59,16 @@ model UserPostRemut {
 }
 
 model Post {
-    id        String          @id @default(cuid())
-    createdAt DateTime        @default(now())
-    content   String          @db.VarChar(255)
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    content   String   @db.VarChar(255)
     parentId  String?
-    parent    Post?           @relation(name: "ParentPost", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // https://pris.ly/d/cyclic-referential-actions
-    comments  Post[]          @relation(name: "ParentPost")
-    user      User            @relation(fields: [userId], references: [id])
+    parent    Post?    @relation(name: "ParentPost", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction) // https://pris.ly/d/cyclic-referential-actions
+    comments  Post[]   @relation(name: "ParentPost")
+    user      User     @relation(fields: [userId], references: [id])
     userId    String
     likes     Likes[]
-    remut     UserPostRemut[]
+    remut     Remut[]
 
     @@index([parentId])
     @@index([userId])

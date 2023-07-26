@@ -43,7 +43,7 @@ export const postRouter = createTRPCRouter({
         },
       });
 
-      const remuts = await ctx.prisma.userPostRemut.findMany({
+      const remuts = await ctx.prisma.remut.findMany({
         where: {
           postId: post.id,
         },
@@ -85,17 +85,17 @@ export const postRouter = createTRPCRouter({
           postId: input.postId,
           userId: input.userId,
         };
-        const isRemutExist = !!(await ctx.prisma.userPostRemut.findUnique({
+        const isRemutExist = !!(await ctx.prisma.remut.findUnique({
           where: { userId_postId: remutIds },
         }));
         if (isRemutExist) {
-          const res = await ctx.prisma.userPostRemut.delete({
+          const res = await ctx.prisma.remut.delete({
             where: { userId_postId: remutIds },
           });
 
           return res;
         } else {
-          const res = await ctx.prisma.userPostRemut.create({
+          const res = await ctx.prisma.remut.create({
             data: remutIds,
           });
 
