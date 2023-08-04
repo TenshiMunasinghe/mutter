@@ -28,13 +28,23 @@ const Post = ({ id }: { id: string }) => {
     },
   });
 
+  const isLiked =
+    post?.likes.findIndex((like) => like.userId === user?.id) !== -1;
+
+  const isRemut =
+    post?.remuts.findIndex((remut) => remut.userId === user?.id) !== -1;
+
   if (!post) return null;
 
   const postedAt = dayjs().to(post.createdAt.toISOString());
-  const isLiked =
-    post.likes.findIndex((like) => like.userId === user?.id) !== -1;
-  const isRemut =
-    post.remuts.findIndex((remut) => remut.userId === user?.id) !== -1;
+
+  const handleLike = () => {
+    likeMutate({ postId: post.id, userId: post.userId });
+  };
+
+  const handleRemut = () => {
+    remutMutate({ postId: post.id, userId: post.userId });
+  };
 
   return (
     <div className="flex space-x-4 bg-gray-950 p-4">
@@ -61,9 +71,7 @@ const Post = ({ id }: { id: string }) => {
               "hover:text-blue-400": !isRemut,
               "text-blue-400": isRemut,
             })}
-            onClick={() =>
-              remutMutate({ postId: post.id, userId: post.userId })
-            }
+            onClick={handleRemut}
           >
             <span>{post.remuts.length}</span>
           </PostIcon>
@@ -73,7 +81,7 @@ const Post = ({ id }: { id: string }) => {
               "hover:text-red-400": !isLiked,
               "text-red-400": isLiked,
             })}
-            onClick={() => likeMutate({ postId: post.id, userId: post.userId })}
+            onClick={handleLike}
           >
             <span>{post.likes.length}</span>
           </PostIcon>
