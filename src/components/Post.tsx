@@ -1,16 +1,18 @@
+import { useUser } from "@clerk/nextjs";
 import classnames from "classnames";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { type ReactNode } from "react";
 import { type IconType } from "react-icons";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
 import { api } from "~/utils/api";
 
 dayjs.extend(relativeTime);
 
 const Post = ({ id }: { id: string }) => {
+  const { user } = useUser();
   const trpcContext = api.useContext();
   const { data: post } = api.post.getById.useQuery({ id });
 
@@ -29,6 +31,10 @@ const Post = ({ id }: { id: string }) => {
   if (!post) return null;
 
   const postedAt = dayjs().to(post.createdAt.toISOString());
+  const isLiked =
+    post.likes.findIndex((like) => like.userId === user?.id) !== -1;
+  const isRemut =
+    post.remuts.findIndex((remut) => remut.userId === user?.id) !== -1;
 
   return (
     <div className="flex space-x-4 bg-gray-950 p-4">
@@ -51,7 +57,10 @@ const Post = ({ id }: { id: string }) => {
           </PostIcon>
           <PostIcon
             icon={FaRetweet}
-            className="hover:text-blue-400"
+            className={classnames({
+              "hover:text-blue-400": !isRemut,
+              "text-blue-400": isRemut,
+            })}
             onClick={() =>
               remutMutate({ postId: post.id, userId: post.userId })
             }
@@ -59,8 +68,11 @@ const Post = ({ id }: { id: string }) => {
             <span>{post.remuts.length}</span>
           </PostIcon>
           <PostIcon
-            icon={AiOutlineHeart}
-            className="hover:text-red-400"
+            icon={isLiked ? AiFillHeart : AiOutlineHeart}
+            className={classnames({
+              "hover:text-red-400": !isLiked,
+              "text-red-400": isLiked,
+            })}
             onClick={() => likeMutate({ postId: post.id, userId: post.userId })}
           >
             <span>{post.likes.length}</span>
