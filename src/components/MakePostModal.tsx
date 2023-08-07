@@ -1,67 +1,89 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/@/components/ui/dialog";
-
 import { useUser } from "@clerk/nextjs";
-
-import { useState, type ReactNode } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { type ReactNode } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "~/@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "~/@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem } from "~/@/components/ui/form";
+import { Input } from "~/@/components/ui/input";
 import { api } from "~/utils/api";
 
 interface Props {
   children: ReactNode;
 }
 
-const MakePostModal = ({ children }: Props) => {
+const formSchema = z.object({
+  content: z.string().min(1).max(255),
+});
+
+const MakePost = () => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      content: "",
+    },
+  });
   const { user } = useUser();
-  const [input, setInput] = useState("");
   const trpcContext = api.useContext();
   const mutation = api.post.makePost.useMutation({
     async onSuccess() {
-      setInput("");
       await trpcContext.post.getSome.invalidate();
     },
   });
 
   if (!user) return null;
 
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (values) => {
+    mutation.mutate({ content: values.content, userId: user.id });
+  };
+
+  return (
+    <div className="flex w-full items-stretch space-x-5">
+      <Image
+        src={user.imageUrl}
+        alt={`profile image of ${user.username || "someone"}`}
+        width={42}
+        height={42}
+        className="h-fit rounded-full"
+      />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex w-full flex-col space-y-4"
+        >
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Mutter something"
+                    autoComplete="off"
+                    className="w-full border-none"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="ml-auto">
+            Mutter
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+const MakePostModal = ({ children }: Props) => {
   return (
     <Dialog>
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Are you sure absolutely sure?</DialogTitle>
-          {/* <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              mutation.mutate({ content: input, userId: user.id });
-            }}
-            className="sticky top-0 flex w-full items-stretch space-x-5 border-2 border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm"
-          >
-            <Image
-              src={user.imageUrl}
-              alt={`profile image of ${user.username || "someone"}`}
-              width={42}
-              height={42}
-              className="h-fit rounded-full"
-            />
-            <input
-              type="text"
-              className="w-full bg-transparent"
-              placeholder="Mutter something."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-          </form> */}
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </DialogDescription>
-        </DialogHeader>
+        <MakePost />
       </DialogContent>
     </Dialog>
   );
