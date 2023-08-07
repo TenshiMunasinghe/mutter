@@ -1,6 +1,7 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
+import MakePostModal from "./MakePostModal";
 
 const Login = () => {
   const { user, isSignedIn } = useUser();
@@ -19,7 +20,7 @@ const Login = () => {
       ) : (
         user && (
           <footer className="fixed bottom-12 left-12">
-            <button className="flex items-center space-x-4 rounded-full p-4 hover:bg-gray-900">
+            <div className="flex items-center space-x-4 rounded-full p-4 hover:bg-gray-900">
               <Image
                 src={user.imageUrl}
                 alt="profile pic"
@@ -28,7 +29,9 @@ const Login = () => {
                 className="rounded-full"
               />
               <div className="flex flex-col">
-                <span className="w-full text-left">Mutter something,</span>
+                <MakePostModal>
+                  <div className="text-left">Mutter something,</div>
+                </MakePostModal>
                 <span className="text-left text-gray-400">
                   @{user.username}
                 </span>
@@ -38,7 +41,7 @@ const Login = () => {
                   <FaSignOutAlt className="h-full w-full" />
                 </button>
               </SignOutButton>
-            </button>
+            </div>
           </footer>
         )
       )}
