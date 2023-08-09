@@ -12,7 +12,7 @@ const Posts = () => {
   const { data } = api.post.getSome.useQuery();
 
   return (
-    <div className="grid w-full space-y-[2px] border-x-2 border-gray-600 bg-gray-600">
+    <div className="grid w-full space-y-[1px] border-x-[1px] border-gray-600 bg-gray-600">
       {data?.map((post) => (
         <Post key={post.id} id={post.id} />
       ))}
@@ -27,7 +27,7 @@ const MakePost = () => {
 
   return (
     <Form {...form}>
-      <div className="sticky top-0 flex w-full items-stretch space-x-5 border-2 border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm">
+      <div className="sticky top-0 flex w-full items-stretch space-x-5 border-[1px] border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm">
         <Image
           src={user.imageUrl}
           alt={`profile image of ${user.username || "someone"}`}
