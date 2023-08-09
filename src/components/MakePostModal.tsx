@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Button } from "~/@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "~/@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem } from "~/@/components/ui/form";
-import { Input } from "~/@/components/ui/input";
+import { Textarea } from "~/@/components/ui/textarea";
 import { api } from "~/utils/api";
 
 interface Props {
@@ -40,7 +40,7 @@ const MakePost = () => {
   };
 
   return (
-    <div className="flex w-full items-stretch space-x-5">
+    <div className="flex w-full items-stretch space-x-5 p-4">
       <Image
         src={user.imageUrl}
         alt={`profile image of ${user.username || "someone"}`}
@@ -59,10 +59,10 @@ const MakePost = () => {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
+                  <Textarea
                     placeholder="Mutter something"
                     autoComplete="off"
-                    className="w-full border-none"
+                    className="w-full resize-none border-none"
                     {...field}
                   />
                 </FormControl>
