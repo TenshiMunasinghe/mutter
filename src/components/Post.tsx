@@ -4,7 +4,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import Link from "next/link";
-import { type ReactNode } from "react";
+import { useRouter } from "next/router";
+import { ComponentProps, type ReactNode } from "react";
 import { type IconType } from "react-icons";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
@@ -13,7 +14,23 @@ import { api } from "~/utils/api";
 
 dayjs.extend(relativeTime);
 
+const LinkWithoutPropagation = ({
+  onClick,
+  ...props
+}: ComponentProps<typeof Link>) => {
+  return (
+    <Link
+      {...props}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!!onClick) onClick(e);
+      }}
+    />
+  );
+};
+
 const Post = ({ id }: { id: string }) => {
+  const router = useRouter();
   const { user } = useUser();
   const trpcContext = api.useContext();
   const { data: post } = api.post.getById.useQuery({ id });
@@ -49,17 +66,27 @@ const Post = ({ id }: { id: string }) => {
   };
 
   return (
-    <div className="flex space-x-4 bg-gray-950 p-4">
-      <Image
-        src={post.author.image}
-        alt={`profile image of ${post.author.name || "someone"}`}
-        width={69}
-        height={69}
-        className="h-fit rounded-full"
-      />
-      <Link href={`/post/${id}`} className="flex flex-col space-y-3">
+    <div
+      className="flex cursor-pointer space-x-4 bg-gray-950 p-4"
+      onClick={() => router.push(`/post/${id}`)}
+    >
+      <LinkWithoutPropagation href={`/user/${post.userId}`} className="h-fit">
+        <Image
+          src={post.author.image}
+          alt={`profile image of ${post.author.name || "someone"}`}
+          width={69}
+          height={69}
+          className="h-fit rounded-full"
+        />
+      </LinkWithoutPropagation>
+      <div className="flex flex-col space-y-3">
         <div className="flex items-center space-x-2">
-          <span className="text-lg font-semibold">@{post.author.name}</span>
+          <LinkWithoutPropagation
+            href={`/user/${post.userId}`}
+            className="text-lg font-semibold"
+          >
+            @{post.author.name}
+          </LinkWithoutPropagation>
           <span className="text-gray-400">{postedAt}</span>
         </div>
         <div>{post.content}</div>
@@ -89,7 +116,7 @@ const Post = ({ id }: { id: string }) => {
           </PostIcon>
           <PostIcon icon={FaShare} className="hover:text-emerald-400" />
         </div>
-      </Link>
+      </div>
     </div>
   );
 };
