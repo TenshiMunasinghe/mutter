@@ -3,6 +3,7 @@ import classnames from "classnames";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import Link from "next/link";
 import { type ReactNode } from "react";
 import { type IconType } from "react-icons";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
@@ -55,7 +56,7 @@ const Post = ({ id }: { id: string }) => {
         height={69}
         className="h-fit rounded-full"
       />
-      <div className="flex flex-col space-y-3">
+      <Link href={`/post/${id}`} className="flex flex-col space-y-3">
         <div className="flex items-center space-x-2">
           <span className="text-lg font-semibold">@{post.author.name}</span>
           <span className="text-gray-400">{postedAt}</span>
@@ -87,7 +88,7 @@ const Post = ({ id }: { id: string }) => {
           </PostIcon>
           <PostIcon icon={FaShare} className="hover:text-emerald-400" />
         </div>
-      </div>
+      </Link>
     </div>
   );
 };
