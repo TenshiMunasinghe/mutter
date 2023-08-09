@@ -14,11 +14,10 @@ interface Props {
   children: ReactNode;
 }
 
-const formSchema = z.object({
-  content: z.string().min(1).max(255),
-});
-
-const MakePost = () => {
+export const useMakePost = () => {
+  const formSchema = z.object({
+    content: z.string().min(1).max(255),
+  });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -27,17 +26,31 @@ const MakePost = () => {
   });
   const { user } = useUser();
   const trpcContext = api.useContext();
-  const mutation = api.post.makePost.useMutation({
+  const { mutateAsync, isLoading } = api.post.makePost.useMutation({
     async onSuccess() {
       await trpcContext.post.getSome.invalidate();
     },
   });
 
-  if (!user) return null;
-
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (values) => {
-    mutation.mutate({ content: values.content, userId: user.id });
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (
+    values
+  ) => {
+    if (!user || isLoading) return;
+    try {
+      await mutateAsync({ content: values.content, userId: user.id });
+      form.setValue("content", "");
+    } catch (e) {
+      console.error(e);
+    }
   };
+
+  return { form, onSubmit, user, isLoading };
+};
+
+const MakePost = () => {
+  const { form, onSubmit, user, isLoading } = useMakePost();
+
+  if (!user) return null;
 
   return (
     <div className="flex w-full items-stretch space-x-5 p-4">
@@ -69,7 +82,7 @@ const MakePost = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="ml-auto">
+          <Button type="submit" className="ml-auto" disabled={isLoading}>
             Mutter
           </Button>
         </form>

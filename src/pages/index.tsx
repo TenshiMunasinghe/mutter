@@ -1,13 +1,10 @@
-import { useUser } from "@clerk/nextjs";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Head from "next/head";
 import Image from "next/image";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "~/@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "~/@/components/ui/form";
 import { Input } from "~/@/components/ui/input";
 import Login from "~/components/Login";
+import { useMakePost } from "~/components/MakePostModal";
 import Post from "~/components/Post";
 import { api } from "~/utils/api";
 
@@ -23,30 +20,10 @@ const Posts = () => {
   );
 };
 
-const formSchema = z.object({
-  content: z.string().min(1).max(255),
-});
-
 const MakePost = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      content: "",
-    },
-  });
-  const { user } = useUser();
-  const trpcContext = api.useContext();
-  const mutation = api.post.makePost.useMutation({
-    async onSuccess() {
-      await trpcContext.post.getSome.invalidate();
-    },
-  });
+  const { form, onSubmit, user, isLoading } = useMakePost();
 
   if (!user) return null;
-
-  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = (values) => {
-    mutation.mutate({ content: values.content, userId: user.id });
-  };
 
   return (
     <Form {...form}>
@@ -78,7 +55,7 @@ const MakePost = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="ml-auto">
+          <Button type="submit" className="ml-auto" disabled={isLoading}>
             Mutter
           </Button>
         </form>
