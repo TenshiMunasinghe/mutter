@@ -8,6 +8,7 @@ import { type ReactNode } from "react";
 import { type IconType } from "react-icons";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
+import { Button } from "~/@/components/ui/button";
 import { api } from "~/utils/api";
 
 dayjs.extend(relativeTime);
@@ -103,16 +104,18 @@ const PostIcon = ({
   onClick?: () => void;
 }) => {
   return (
-    <button
-      className={classnames(
-        "flex items-center space-x-2 transition-colors",
-        props.className
-      )}
-      onClick={props.onClick}
+    <Button
+      className={classnames("space-x-2", props.className)}
+      variant="ghost"
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!props.onClick) return;
+        props.onClick();
+      }}
     >
       <Icon className="h-4 w-4" />
       {props.children}
-    </button>
+    </Button>
   );
 };
 
