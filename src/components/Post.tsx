@@ -1,16 +1,13 @@
-import { useUser } from "@clerk/nextjs";
 import classnames from "classnames";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ComponentProps, type ReactNode } from "react";
-import { type IconType } from "react-icons";
+import { type ComponentProps } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
-import { Button } from "~/@/components/ui/button";
-import { api } from "~/utils/api";
+import { PostIcon, usePost } from "~/pages/post/[id]";
 
 dayjs.extend(relativeTime);
 
@@ -31,39 +28,12 @@ const LinkWithoutPropagation = ({
 
 const Post = ({ id }: { id: string }) => {
   const router = useRouter();
-  const { user } = useUser();
-  const trpcContext = api.useContext();
-  const { data: post } = api.post.getById.useQuery({ id });
 
-  const { mutate: remutMutate } = api.post.remut.useMutation({
-    async onSuccess() {
-      await trpcContext.post.getById.invalidate({ id });
-    },
-  });
-
-  const { mutate: likeMutate } = api.post.like.useMutation({
-    async onSuccess() {
-      await trpcContext.post.getById.invalidate({ id });
-    },
-  });
-
-  const isLiked =
-    post?.likes.findIndex((like) => like.userId === user?.id) !== -1;
-
-  const isRemut =
-    post?.remuts.findIndex((remut) => remut.userId === user?.id) !== -1;
+  const { post, isLiked, isRemut, handleLike, handleRemut } = usePost(id);
 
   if (!post) return null;
 
-  const postedAt = dayjs().to(post.createdAt.toISOString());
-
-  const handleLike = () => {
-    likeMutate({ postId: post.id, userId: post.userId });
-  };
-
-  const handleRemut = () => {
-    remutMutate({ postId: post.id, userId: post.userId });
-  };
+  const postedAt = dayjs().to(post?.createdAt.toISOString());
 
   return (
     <div
@@ -72,7 +42,7 @@ const Post = ({ id }: { id: string }) => {
     >
       <LinkWithoutPropagation href={`/user/${post.userId}`} className="h-fit">
         <Image
-          src={post.author.image}
+          src={post.author.image || ""}
           alt={`profile image of ${post.author.name || "someone"}`}
           width={69}
           height={69}
@@ -118,31 +88,6 @@ const Post = ({ id }: { id: string }) => {
         </div>
       </div>
     </div>
-  );
-};
-
-const PostIcon = ({
-  icon: Icon,
-  ...props
-}: {
-  icon: IconType;
-  children?: ReactNode;
-  className?: string;
-  onClick?: () => void;
-}) => {
-  return (
-    <Button
-      className={classnames("space-x-2", props.className)}
-      variant="ghost"
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!props.onClick) return;
-        props.onClick();
-      }}
-    >
-      <Icon className="h-4 w-4" />
-      {props.children}
-    </Button>
   );
 };
 

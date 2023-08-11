@@ -1,12 +1,72 @@
+import { useUser } from "@clerk/nextjs";
+import classnames from "classnames";
+import dayjs from "dayjs";
 import { ChevronLeft } from "lucide-react";
 import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { type ReactNode } from "react";
+import { type IconType } from "react-icons";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
 import { Button } from "~/@/components/ui/button";
+import { Separator } from "~/@/components/ui/separator";
 import Login from "~/components/Login";
+import { api } from "~/utils/api";
+
+export const usePost = (id: string) => {
+  const { user } = useUser();
+  const trpcContext = api.useContext();
+  const { data: post } = api.post.getById.useQuery({ id });
+
+  const { mutate: remutMutate } = api.post.remut.useMutation({
+    async onSuccess() {
+      await trpcContext.post.getById.invalidate({ id });
+    },
+  });
+
+  const { mutate: likeMutate } = api.post.like.useMutation({
+    async onSuccess() {
+      await trpcContext.post.getById.invalidate({ id });
+    },
+  });
+
+  const isLiked = !!(
+    post && post.likes.findIndex((like) => like.userId === user?.id) !== -1
+  );
+
+  const isRemut = !!(
+    post && post.remuts.findIndex((remut) => remut.userId === user?.id) !== -1
+  );
+
+  const handleLike = () => {
+    if (!post) return;
+    likeMutate({ postId: post.id, userId: post.userId });
+  };
+
+  const handleRemut = () => {
+    if (!post) return;
+    remutMutate({ postId: post.id, userId: post.userId });
+  };
+
+  return {
+    post,
+    isLiked,
+    isRemut,
+    handleLike,
+    handleRemut,
+  };
+};
 
 const Post = () => {
   const router = useRouter();
+  const id = router.query.id?.toString() || "";
+  const { post, isLiked, isRemut, handleLike, handleRemut } = usePost(id);
+
+  if (!post) return null;
+
+  const postedAt = dayjs(post.createdAt).format("h:mm A · MMM DD, YYYY");
 
   return (
     <>
@@ -16,7 +76,7 @@ const Post = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <section className="relative mx-auto flex min-h-screen flex-col items-center border-x-[1px] border-gray-600 lg:max-w-2xl">
+      <section className="relative mx-auto flex min-h-screen flex-col border-x-[1px] border-gray-600 p-2 lg:max-w-2xl">
         <header>
           <Button variant="ghost" size="icon" asChild={true}>
             <Link href="/">
@@ -24,10 +84,97 @@ const Post = () => {
             </Link>
           </Button>
         </header>
+        <div
+          className="flex flex-col bg-gray-950 p-4"
+          onClick={() => router.push(`/post/${id}`)}
+        >
+          <div className="flex items-center space-x-4">
+            <Image
+              src={post.author.image}
+              alt={`profile image of ${post.author.name || "someone"}`}
+              width={47}
+              height={47}
+              className="h-fit rounded-full"
+            />
+            <div className="flex-col">
+              <div className="text-lg font-semibold">@{post.author.name}</div>
+              <span className="text-sm text-gray-400">{postedAt}</span>
+            </div>
+          </div>
+          <div className="py-4">{post.content}</div>
+
+          <Separator className="my-1" />
+
+          <div className="flex space-x-3 py-3">
+            <Info main={post.comments.length.toString()} sub="comments" />
+            <Info main={post.remuts.length.toString()} sub="remuts" />
+            <Info main={post.likes.length.toString()} sub="likes" />
+          </div>
+
+          <Separator className="my-1" />
+
+          <div className="flex justify-evenly">
+            <PostIcon icon={FaRegComment} className="hover:text-emerald-400" />
+            <PostIcon
+              icon={FaRetweet}
+              className={classnames({
+                "hover:text-blue-400": !isRemut,
+                "text-blue-400": isRemut,
+              })}
+              onClick={handleRemut}
+            />
+
+            <PostIcon
+              icon={isLiked ? AiFillHeart : AiOutlineHeart}
+              className={classnames({
+                "hover:text-red-400": !isLiked,
+                "text-red-400": isLiked,
+              })}
+              onClick={handleLike}
+            />
+            <PostIcon icon={FaShare} className="hover:text-emerald-400" />
+          </div>
+
+          <Separator className="my-1" />
+        </div>
       </section>
 
       <Login />
     </>
+  );
+};
+
+const Info = ({ main, sub }: { main: string; sub: string }) => {
+  return (
+    <div className="flex space-x-1">
+      <span className="font-medium">{main}</span>
+      <span className="text-gray-400">{sub}</span>
+    </div>
+  );
+};
+
+export const PostIcon = ({
+  icon: Icon,
+  ...props
+}: {
+  icon: IconType;
+  children?: ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) => {
+  return (
+    <Button
+      className={classnames("space-x-2", props.className)}
+      variant="ghost"
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!props.onClick) return;
+        props.onClick();
+      }}
+    >
+      <Icon className="h-4 w-4" />
+      {props.children}
+    </Button>
   );
 };
 
