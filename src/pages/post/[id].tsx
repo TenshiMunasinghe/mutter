@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from "@clerk/nextjs";
 import classnames from "classnames";
 import dayjs from "dayjs";
 import { ChevronLeft } from "lucide-react";
@@ -12,23 +12,42 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
 import { Button } from "~/@/components/ui/button";
 import { Separator } from "~/@/components/ui/separator";
+import { ToastAction } from "~/@/components/ui/toast";
+import { useToast } from "~/@/components/ui/use-toast";
 import Login from "~/components/Login";
 import { api } from "~/utils/api";
 
 export const usePost = (id: string) => {
   const { user } = useUser();
+  const { openSignIn } = useClerk();
   const trpcContext = api.useContext();
   const { data: post } = api.post.getById.useQuery({ id });
+  const { toast } = useToast();
+
+  const toastOpt = {
+    title: "You must login to make this action.",
+    action: (
+      <ToastAction onClick={() => openSignIn()} altText="Login">
+        Login
+      </ToastAction>
+    ),
+  };
 
   const { mutate: remutMutate } = api.post.remut.useMutation({
     async onSuccess() {
       await trpcContext.post.getById.invalidate({ id });
+    },
+    onError() {
+      toast(toastOpt);
     },
   });
 
   const { mutate: likeMutate } = api.post.like.useMutation({
     async onSuccess() {
       await trpcContext.post.getById.invalidate({ id });
+    },
+    onError() {
+      toast(toastOpt);
     },
   });
 
