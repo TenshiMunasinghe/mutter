@@ -37,54 +37,56 @@ const Post = ({ id }: { id: string }) => {
 
   return (
     <div
-      className="flex cursor-pointer space-x-4 bg-gray-950 p-4"
+      className="flex cursor-pointer flex-col space-y-3 bg-gray-950 p-4"
       onClick={() => router.push(`/post/${id}`)}
     >
-      <LinkWithoutPropagation href={`/user/${post.userId}`} className="h-fit">
-        <Avatar className="h-14 w-14">
-          <AvatarImage
-            src={post.author.image || ""}
-            alt={`profile image of ${post.author.name || "someone"}`}
-          />
-        </Avatar>
-      </LinkWithoutPropagation>
-      <div className="flex flex-col space-y-3">
-        <div className="flex items-center space-x-2">
-          <LinkWithoutPropagation
-            href={`/user/${post.userId}`}
-            className="text-lg font-semibold"
-          >
-            @{post.author.name}
-          </LinkWithoutPropagation>
-          <span className="text-gray-400">{postedAt}</span>
+      <div className="flex w-full space-x-5">
+        <LinkWithoutPropagation href={`/user/${post.userId}`} className="h-fit">
+          <Avatar className="h-14 w-14">
+            <AvatarImage
+              src={post.author.image || ""}
+              alt={`profile image of ${post.author.name || "someone"}`}
+            />
+          </Avatar>
+        </LinkWithoutPropagation>
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center space-x-2">
+            <LinkWithoutPropagation
+              href={`/user/${post.userId}`}
+              className="text-lg font-semibold"
+            >
+              @{post.author.name}
+            </LinkWithoutPropagation>
+            <span className="text-gray-400">{postedAt}</span>
+          </div>
+          <div>{post.content}</div>
         </div>
-        <div>{post.content}</div>
-        <div className="grid grid-cols-4 items-center">
-          <PostIcon icon={FaRegComment} className="hover:text-emerald-400">
-            <span>{post.comments.length}</span>
-          </PostIcon>
-          <PostIcon
-            icon={FaRetweet}
-            className={classnames({
-              "hover:text-blue-400": !isRemut,
-              "text-blue-400": isRemut,
-            })}
-            onClick={handleRemut}
-          >
-            <span>{post.remuts.length}</span>
-          </PostIcon>
-          <PostIcon
-            icon={isLiked ? AiFillHeart : AiOutlineHeart}
-            className={classnames({
-              "hover:text-red-400": !isLiked,
-              "text-red-400": isLiked,
-            })}
-            onClick={handleLike}
-          >
-            <span>{post.likes.length}</span>
-          </PostIcon>
-          <PostIcon icon={FaShare} className="hover:text-emerald-400" />
-        </div>
+      </div>
+      <div className="flex items-center justify-evenly">
+        <PostIcon icon={FaRegComment} className="hover:text-emerald-400">
+          <span>{post.comments.length}</span>
+        </PostIcon>
+        <PostIcon
+          icon={FaRetweet}
+          className={classnames({
+            "hover:text-blue-400": !isRemut,
+            "text-blue-400": isRemut,
+          })}
+          onClick={handleRemut}
+        >
+          <span>{post.remuts.length}</span>
+        </PostIcon>
+        <PostIcon
+          icon={isLiked ? AiFillHeart : AiOutlineHeart}
+          className={classnames({
+            "hover:text-red-400": !isLiked,
+            "text-red-400": isLiked,
+          })}
+          onClick={handleLike}
+        >
+          <span>{post.likes.length}</span>
+        </PostIcon>
+        <PostIcon icon={FaShare} className="hover:text-emerald-400" />
       </div>
     </div>
   );
