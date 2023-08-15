@@ -1,12 +1,12 @@
 import classnames from "classnames";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { type ComponentProps } from "react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
+import { Avatar, AvatarImage } from "~/@/components/ui/avatar";
 import { PostIcon, usePost } from "~/pages/post/[id]";
 
 dayjs.extend(relativeTime);
@@ -41,13 +41,12 @@ const Post = ({ id }: { id: string }) => {
       onClick={() => router.push(`/post/${id}`)}
     >
       <LinkWithoutPropagation href={`/user/${post.userId}`} className="h-fit">
-        <Image
-          src={post.author.image || ""}
-          alt={`profile image of ${post.author.name || "someone"}`}
-          width={69}
-          height={69}
-          className="h-fit rounded-full"
-        />
+        <Avatar className="h-14 w-14">
+          <AvatarImage
+            src={post.author.image || ""}
+            alt={`profile image of ${post.author.name || "someone"}`}
+          />
+        </Avatar>
       </LinkWithoutPropagation>
       <div className="flex flex-col space-y-3">
         <div className="flex items-center space-x-2">

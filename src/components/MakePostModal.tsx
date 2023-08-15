@@ -1,9 +1,9 @@
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { type ReactNode } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
+import { Avatar, AvatarImage } from "~/@/components/ui/avatar";
 import { Button } from "~/@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "~/@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem } from "~/@/components/ui/form";
@@ -54,13 +54,12 @@ const MakePost = () => {
 
   return (
     <div className="flex w-full items-stretch space-x-5 p-4">
-      <Image
-        src={user.imageUrl}
-        alt={`profile image of ${user.username || "someone"}`}
-        width={42}
-        height={42}
-        className="h-fit rounded-full"
-      />
+      <Avatar className="h-8 w-8">
+        <AvatarImage
+          src={user.imageUrl}
+          alt={`profile image of ${user.username || "someone"}`}
+        />
+      </Avatar>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

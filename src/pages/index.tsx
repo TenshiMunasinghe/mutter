@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Image from "next/image";
+import { Avatar, AvatarImage } from "~/@/components/ui/avatar";
 import { Button } from "~/@/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "~/@/components/ui/form";
 import { Input } from "~/@/components/ui/input";
@@ -28,13 +28,12 @@ const MakePost = () => {
   return (
     <Form {...form}>
       <div className="sticky top-0 flex w-full items-stretch space-x-5 border-[1px] border-t-0 border-gray-600 bg-gray-950/50 p-5 backdrop-blur-sm">
-        <Image
-          src={user.imageUrl}
-          alt={`profile image of ${user.username || "someone"}`}
-          width={42}
-          height={42}
-          className="h-fit rounded-full"
-        />
+        <Avatar className="h-8 w-8">
+          <AvatarImage
+            src={user.imageUrl}
+            alt={`profile image of ${user.username || "someone"}`}
+          />
+        </Avatar>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex w-full flex-col space-y-4"

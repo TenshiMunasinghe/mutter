@@ -1,6 +1,6 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
-import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
+import { Avatar, AvatarImage } from "~/@/components/ui/avatar";
 import { Button } from "~/@/components/ui/button";
 import MakePostModal from "./MakePostModal";
 
@@ -22,13 +22,12 @@ const Login = () => {
         user && (
           <footer className="fixed bottom-12 left-12">
             <div className="flex items-center space-x-4 rounded-full p-4 hover:bg-gray-900">
-              <Image
-                src={user.imageUrl}
-                alt="profile pic"
-                width={42}
-                height={42}
-                className="rounded-full"
-              />
+              <Avatar>
+                <AvatarImage
+                  src={user.imageUrl}
+                  alt={user.username || "avatar"}
+                />
+              </Avatar>
               <div className="flex flex-col">
                 <MakePostModal>
                   <div className="text-left">Mutter something,</div>
