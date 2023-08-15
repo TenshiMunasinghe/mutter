@@ -3,13 +3,13 @@ import classnames from "classnames";
 import dayjs from "dayjs";
 import { ChevronLeft } from "lucide-react";
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { type ReactNode } from "react";
 import { type IconType } from "react-icons";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment, FaRetweet, FaShare } from "react-icons/fa";
+import { Avatar, AvatarImage } from "~/@/components/ui/avatar";
 import { Button } from "~/@/components/ui/button";
 import { Separator } from "~/@/components/ui/separator";
 import { ToastAction } from "~/@/components/ui/toast";
@@ -108,13 +108,12 @@ const Post = () => {
           onClick={() => router.push(`/post/${id}`)}
         >
           <div className="flex items-center space-x-4">
-            <Image
-              src={post.author.image}
-              alt={`profile image of ${post.author.name || "someone"}`}
-              width={47}
-              height={47}
-              className="h-fit rounded-full"
-            />
+            <Avatar className="h-12 w-12">
+              <AvatarImage
+                src={post.author.image || ""}
+                alt={`profile image of ${post.author.name || "someone"}`}
+              />
+            </Avatar>
             <div className="flex-col">
               <div className="text-lg font-semibold">@{post.author.name}</div>
               <span className="text-sm text-gray-400">{postedAt}</span>
