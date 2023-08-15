@@ -1,6 +1,7 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { FaSignOutAlt } from "react-icons/fa";
+import { Button } from "~/@/components/ui/button";
 import MakePostModal from "./MakePostModal";
 
 const Login = () => {
@@ -12,9 +13,9 @@ const Login = () => {
         <footer className="fixed bottom-0 left-0 flex flex-col items-center space-y-3 rounded-tr bg-emerald-700 px-12 py-7">
           <span className="text-2xl font-bold">Join the Muttering.</span>
           <SignInButton mode="modal">
-            <button className="w-fit rounded bg-gray-100 px-5 py-2 text-lg text-emerald-700 ">
+            <Button variant="secondary" className="text-lg">
               Sign In
-            </button>
+            </Button>
           </SignInButton>
         </footer>
       ) : (
@@ -37,9 +38,9 @@ const Login = () => {
                 </span>
               </div>
               <SignOutButton>
-                <button className="h-[42px] w-[42px] rounded-full bg-emerald-700 p-2">
-                  <FaSignOutAlt className="h-full w-full" />
-                </button>
+                <Button size="icon" className="rounded-full">
+                  <FaSignOutAlt className="h-5 w-5" />
+                </Button>
               </SignOutButton>
             </div>
           </footer>
