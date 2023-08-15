@@ -70,14 +70,14 @@ export const postRouter = createTRPCRouter({
     .input(z.object({ content: z.string(), userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       try {
-        await ctx.prisma.post.create({
+        const res = await ctx.prisma.post.create({
           data: {
             ...input,
           },
         });
-        return { success: true };
+        return res;
       } catch (error) {
-        return { success: false, error };
+        return { error };
       }
     }),
   remut: protectedProcedure
