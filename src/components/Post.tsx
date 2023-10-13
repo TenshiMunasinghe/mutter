@@ -20,7 +20,7 @@ const LinkWithoutPropagation = ({
       {...props}
       onClick={(e) => {
         e.stopPropagation();
-        if (!!onClick) onClick(e);
+        if (onClick) onClick(e);
       }}
     />
   );
