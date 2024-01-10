@@ -1,5 +1,9 @@
 const User = () => {
-  return <div className="">User Page</div>;
+  return (
+    <div className="">
+      <main className="grid grid-cols-4"></main>
+    </div>
+  );
 };
 
 export default User;
