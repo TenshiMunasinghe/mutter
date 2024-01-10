@@ -1,3 +1,3 @@
 https://mutter.vercel.app/
 
-* The database maybe sleeping.
+The database maybe sleeping.
